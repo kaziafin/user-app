@@ -1,35 +1,62 @@
-import React, { useEffect } from 'react'
-import { useState } from 'react'
-import api from '../api';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import UserCard from './UserCard';
+import UserForm from './UserForm';
+import { getUsers } from '../Services/api'
 
-export default function UserList() {
+const UserList = () => {
+  const [users, setUsers] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
 
-    const [userList ,setUserList]=useState([]);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await getUsers();
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Error fetching users', error);
+      }
+    };
 
-    useEffect(()=>{
-        api.get('/users').then(response=>{
-         setUserList(response?.data);
+    fetchUsers();
+  }, []);
 
-        })
-        .catch(error=>{
-            console.error("Error fetch data")
-        });
+  const handleAddUser = (newUser) => {
+    setUsers([...users, newUser]);
+  };
 
-    },[])
+  const handleUpdateUser = (updatedUser) => {
+    setUsers(users.map(user => user.id === updatedUser.id ? updatedUser : user));
+    setEditingUser(null);
+  };
+
+  const handleDeleteUser = (userId) => {
+    setUsers(users.filter(user => user.id !== userId));
+  };
+
+  const handleEditUser = (user) => {
+    setEditingUser(user);
+  };
+
   return (
-    <div>
-      <h2>user List</h2>
-      <ul>
-        {userList.map(user=>(
-            <li key={user.id}>
-                {user.name}
-            </li>
-        )
-
-
-
-        )}
-      </ul>
+    <div className="user-list">
+      <UserForm
+        onAddUser={handleAddUser}
+        onUpdateUser={handleUpdateUser}
+        editingUser={editingUser}
+      />
+      <div className="user-cards">
+        {users.map(user => (
+          <UserCard
+            key={user.id}
+            user={user}
+            onEditUser={handleEditUser}
+            onDeleteUser={handleDeleteUser}
+          />
+        ))}
+      </div>
     </div>
-  )
-}
+  );
+};
+
+export default UserList;

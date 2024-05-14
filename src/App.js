@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import Login from './components/login';
+import React from 'react';
+// import Header from './components/Header';
+import UserList from './components/UserList';
+import './styles/Style.css'
 
-
-function App() {
-  
+const App = () => {
   return (
-  <Login/>
+    <div className="app-container">
+      {/* <Header /> */}
+      <UserList />
+    </div>
   );
-}
-
+};
 
 export default App;
